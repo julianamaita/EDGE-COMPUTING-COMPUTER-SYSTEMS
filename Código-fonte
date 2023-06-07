@@ -13,23 +13,24 @@ Servo servo1;
 
 void setup()
 {
-  lcd.begin(16, 2);
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print("Inicializando");
-  delay(1000);
+  lcd.begin(16, 2);              // Inicializa o display LCD com 16 colunas e 2 linhas
+  lcd.clear();                   // Limpa o conteúdo do display LCD
+  lcd.setCursor(0, 0);           // Define a posição do cursor no display LCD
+  lcd.print("Inicializando");    // Escreve "Inicializando" no display LCD
+  delay(1000);                   // Aguarda 1 segundo
   
-  lcd.clear();
+  lcd.clear();                   // Limpa o conteúdo do display LCD novamente
   
-  pinMode(ledRed, OUTPUT);
-  pinMode(ledGreen, OUTPUT);
-  pinMode(buzzer, OUTPUT);
-  servo1.attach(servoPin);
-  Serial.begin(9600);
+  pinMode(ledRed, OUTPUT);       // Configura o pino do LED vermelho como saída
+  pinMode(ledGreen, OUTPUT);     // Configura o pino do LED verde como saída
+  pinMode(buzzer, OUTPUT);       // Configura o pino do buzzer como saída
+  servo1.attach(servoPin);       // Anexa o objeto servo1 ao pino do servo
+  Serial.begin(9600);            // Inicializa a comunicação serial a uma taxa de 9600 bps
 }
 
 void loop()
 {
+  // Leitura dos sensores e conversão de valores
   int luz = analogRead(A0);
   int luzPorcentagem = map(luz, 0, 1023, -5, 105);
   
@@ -41,81 +42,96 @@ void loop()
   tensao /= 1024;
   float temperatura = (tensao - 0.5) * 100;
   
+  // Impressão dos valores lidos no monitor serial
   Serial.println(temperatura);
   Serial.println(luzPorcentagem);
   Serial.println(umidade);
   
+  // Controle das ações com base nos valores lidos
   if(luzPorcentagem >= 80) {
-  	servo1.write(180);
+    // Abre as janelas
+    servo1.write(180);
     while(true) {
-    	lcd.setCursor(0, 0);
-    	lcd.print("Janelas");
-    	lcd.setCursor(0, 1);
-    	lcd.print("Abertas");
-    	delay(1500);
-    	lcd.clear();
+      // Exibe "Janelas Abertas" no display LCD
+      lcd.setCursor(0, 0);
+      lcd.print("Janelas");
+      lcd.setCursor(0, 1);
+      lcd.print("Abertas");
+      delay(1500);
+      lcd.clear();
       
-      	lcd.setCursor(0, 0);
-    	lcd.print("Temp: ");
-    	lcd.setCursor(0, 1);
-    	lcd.print(temperatura);
-      	lcd.print("C");
-    	delay(1500);
-    	lcd.clear();
+      // Exibe a temperatura no display LCD
+      lcd.setCursor(0, 0);
+      lcd.print("Temp: ");
+      lcd.setCursor(0, 1);
+      lcd.print(temperatura);
+      lcd.print("C");
+      delay(1500);
+      lcd.clear();
       
-      	lcd.setCursor(0, 0);
-    	lcd.print("Umidade: ");
-    	lcd.setCursor(0, 1);
-    	lcd.print(umidade);
-    	delay(1500);
-    	lcd.clear();
-      	break;
+      // Exibe a umidade no display LCD
+      lcd.setCursor(0, 0);
+      lcd.print("Umidade: ");
+      lcd.setCursor(0, 1);
+      lcd.print(umidade);
+      delay(1500);
+      lcd.clear();
+      
+      break;
     }
   } else {
+    // Fecha as janelas
     servo1.write(0);
     while(true) {
-    	lcd.setCursor(0, 0);
-    	lcd.print("Janelas");
-    	lcd.setCursor(0, 1);
-    	lcd.print("Fechadas");
-    	delay(1500);
-    	lcd.clear();
+      // Exibe "Janelas Fechadas" no display LCD
+      lcd.setCursor(0, 0);
+      lcd.print("Janelas");
+      lcd.setCursor(0, 1);
+      lcd.print("Fechadas");
+      delay(1500);
+      lcd.clear();
       
-      	lcd.setCursor(0, 0);
-    	lcd.print("Temp: ");
-    	lcd.setCursor(0, 1);
-    	lcd.print(temperatura);
-      	lcd.print("C");
-    	delay(1500);
-    	lcd.clear();
+      // Exibe a temperatura no display LCD
+      lcd.setCursor(0, 0);
+      lcd.print("Temp: ");
+      lcd.setCursor(0, 1);
+      lcd.print(temperatura);
+      lcd.print("C");
+      delay(1500);
+      lcd.clear();
       
-      	lcd.setCursor(0, 0);
-    	lcd.print("Umidade: ");
-    	lcd.setCursor(0, 1);
-    	lcd.print(umidade);
-    	delay(1500);
-    	lcd.clear();
-      	break;
+      // Exibe a umidade no display LCD
+      lcd.setCursor(0, 0);
+      lcd.print("Umidade: ");
+      lcd.setCursor(0, 1);
+      lcd.print(umidade);
+      delay(1500);
+      lcd.clear();
+      
+      break;
     }
   }
   
+  // Verifica se a umidade está dentro de uma faixa adequada
   int umidadeBoa = umidade >= 10 && umidade <= 30;
   
   if(temperatura <= 35 && umidadeBoa) {
-  	digitalWrite(ledGreen, HIGH);
+    // Condição ideal: acende o LED verde e desliga o LED vermelho e o buzzer
+    digitalWrite(ledGreen, HIGH);
     digitalWrite(ledRed, LOW);
-    
     digitalWrite(buzzer, LOW);
   } else {
-  	digitalWrite(ledRed, HIGH);
+    // Condição não ideal: acende o LED vermelho, desliga o LED verde e ativa o buzzer
+    digitalWrite(ledRed, HIGH);
     digitalWrite(ledGreen, LOW);
     
     while(true) {
-    	digitalWrite(buzzer, HIGH);
-    	delay(3000);
-    	digitalWrite(buzzer, LOW);
-      	delay(3000);
-     	break;
+      // Liga e desliga o buzzer em intervalos de 3 segundos
+      digitalWrite(buzzer, HIGH);
+      delay(3000);
+      digitalWrite(buzzer, LOW);
+      delay(3000);
+      break;
     }
   }
 }
